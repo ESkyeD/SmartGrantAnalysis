@@ -19,14 +19,11 @@ text_data <- data.frame(text = sapply(corpus, as.character), stringsAsFactors = 
 # Convert text to lower case
 text_data$text <- tolower(text_data$text)
 text_data$text <- removeWords(text_data$text, stopwords("english"))
-text_data$text<-removeWords(text_data$text,top_terms$Processing)
 # Remove punctuation
 text_data$text <- removePunctuation(text_data$text)
 
 # Remove numbers
 text_data$text <- removeNumbers(text_data$text)
-
-# Remove stopwords
 
 # Strip whitespace
 text_data$text <- stripWhitespace(text_data$text)
@@ -46,7 +43,7 @@ it<-itoken(tokens,progressbar = FALSE)
 # Create a vectorizer
 vectorizer <- vocab_vectorizer(vocab)
 #Create a TCM
-tcm <- create_tcm(it, vectorizer, skip_grams_window = 6)
+tcm <- create_tcm(it, vectorizer, skip_grams_window = 8)
 
 # Train a GloVe model
 glove <- GlobalVectors$new(rank = 50, x_max = 10)
