@@ -80,7 +80,7 @@ tokens <- word_tokenizer(text_data_sentences$sentences)
 vocab <- create_vocabulary(itoken(tokens, progressbar = FALSE))
 it <- itoken(tokens, progressbar = FALSE)
 vectorizer <- vocab_vectorizer(vocab)
-tcm <- create_tcm(it, vectorizer, skip_grams_window = 2)
+tcm <- create_tcm(it, vectorizer, skip_grams_window = 4)
 
 # Assuming `word_vectors` is previously trained
 # Train a GloVe model (optional)
@@ -176,26 +176,25 @@ mapped_sentences <- sapply(DoubleFilter$Sentence, map_to_original_jaccard, origi
 DoubleFilter$MappedOriginal <- mapped_sentences
 TripleFilter<-DoubleFilter
 
-TripleFilter<-DoubleFilter%>%mutate(Count,ifelse(Count==3,NA,Count))
-TripleFilter<-na.omit(DoubleFilter)
-
-
-
+DoubleFilter<-DoubleFilter%>%mutate(Count,ifelse(Count==3,NA,Count))
+DoubleFilter<-na.omit(DoubleFilter)
+options(width=2000)
 count_words <- function(sentence) {
   words <- strsplit(sentence, "\\s+")[[1]]
   return(length(words))
 }
 
 # Filter out sentences with fewer than 4 words
-TripleFilter<- TripleFilter%>%
+DoubleFilter<- DoubleFilter%>%
   filter(sapply(Sentence, count_words) > 4)
 
-TripleFilter<-TripleFilter%>%
+DoubleFilter<-DoubleFilter%>%
   arrange(desc(Count))
 
-FinalDoneGoddamn<-data.frame(sentence=TripleFilter$MappedOriginal,Popularity=TripleFilter$Count)
 
-DoubleFilter<-DoubleFilter%>%arrange(desc(Count))
-FinalDoubleDone<-data.frame(sentence=DoubleFilter$MappedOriginal,Popularity=DoubleFilter$Count)
+DoubleFilter$MappedOriginal <- sapply(DoubleFilter$MappedOriginal, function(x) paste(x, collapse = " "))
+FinalDoubleDone<-subset(DoubleFilter,select=-Sentence)
+FinalDoubleDone<-na.omit(FinalDoubleDone)
+
 
 write.csv(FinalDoubleDone, "filtered_sentences.csv", row.names=FALSE)
